@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
         return repository.findAllByType(type);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public TransactionDTO createTransaction(Long transactionId, TransactionDTO transactionDTO) {
 
