@@ -7,6 +7,7 @@ import com.loco.transaction.management.pojo.TransactionDTO;
 import com.loco.transaction.management.pojo.response.TransactionSummation;
 import com.loco.transaction.management.repositories.TransactionRepository;
 import com.loco.transaction.management.services.base.TransactionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -17,6 +18,7 @@ import java.util.List;
 import static com.loco.transaction.management.constants.LocoExceptionConstants.*;
 
 @Service
+@Slf4j
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository repository;
@@ -33,10 +35,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
-    public Transactions createTransaction(Long transactionId, TransactionDTO transactionDTO) {
+    public TransactionDTO createTransaction(Long transactionId, TransactionDTO transactionDTO) {
 
         //checking if transaction already exists
-        if(repository.findByTransactionId(transactionId).isPresent()) {
+        if (repository.findByTransactionId(transactionId).isPresent()) {
+            log.error(TRANSACTION_EXISTS);
             throw new BadRequestException(TRANSACTION_EXISTS);
         }
 
@@ -52,7 +55,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .amount(transactionDTO.getAmount())
                 .parentId(transactionDTO.getParentId())
                 .build();
-        return repository.save(transactions);
+        transactions = repository.save(transactions);
+        return TransactionDTO.builder()
+                .amount(transactions.getAmount())
+                .type(transactions.getType())
+                .parentId(transactions.getParentId())
+                .build();
     }
 
     @Override
@@ -84,7 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
     /**
      * Recursively calculates the sum of linked transactions for a given transaction ID.
      *
-     * @param parentId  The ID of the transaction.
+     * @param parentId The ID of the transaction.
      * @return The sum of children transactions.
      */
     private Double aggregateSumOfChildrenTransactions(Long parentId) {
@@ -92,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
         double sum = 0.0;
         List<Transactions> children = repository.findAllByParentId(parentId);
 
-        for(Transactions child : children) {
+        for (Transactions child : children) {
             sum += child.getAmount() + aggregateSumOfChildrenTransactions(child.getTransactionId());
         }
 

@@ -4,8 +4,8 @@ import com.loco.transaction.management.pojo.TransactionDTO;
 import com.loco.transaction.management.pojo.response.Response;
 import com.loco.transaction.management.pojo.response.TransactionSummation;
 import com.loco.transaction.management.services.base.TransactionService;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
+import com.loco.transaction.management.utils.LocoTestUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,13 +13,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 
@@ -31,29 +28,26 @@ class TransactionControllerTest {
     @InjectMocks
     private TransactionController controller;
 
-    private Validator validator;
-
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
     void testCreateTransaction() {
 
         Long transactionId = 1L;
-        TransactionDTO transactionDTO = getTransactionDto(400.0, "cars", null);
+        TransactionDTO transactionDTO = LocoTestUtils.getTransactionDto(400.0, "cars", null);
 
         ResponseEntity<Response> expectedResponse = new ResponseEntity<>(
                 Response.builder().status(HttpStatus.OK.name()).build(),
                 HttpStatus.OK
         );
 
-        when(service.createTransaction(transactionId, transactionDTO)).thenReturn(null);
+        when(service.createTransaction(transactionId, transactionDTO)).thenReturn(transactionDTO);
 
         ResponseEntity<Response> actualResponse = controller.createTransaction(transactionId, transactionDTO);
-        System.out.println(actualResponse);
+
         Assertions.assertEquals(expectedResponse, actualResponse);
 
     }
@@ -77,7 +71,7 @@ class TransactionControllerTest {
     @Test
     void testGetTransactionByTransactionId() {
         Long transactionId = 1L;
-        TransactionDTO expectedTransaction = getTransactionDto(400.0, "cars", null);
+        TransactionDTO expectedTransaction = LocoTestUtils.getTransactionDto(400.0, "cars", null);
 
         when(service.findByTransactionId(transactionId)).thenReturn(expectedTransaction);
 
@@ -99,14 +93,6 @@ class TransactionControllerTest {
 
         Assertions.assertEquals(expectedResponse, actualResponse);
 
-    }
-
-    TransactionDTO getTransactionDto(Double amount, String type, Long parentId) {
-        return TransactionDTO.builder()
-                .amount(amount)
-                .type(type)
-                .parentId(parentId)
-                .build();
     }
 
 }

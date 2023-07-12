@@ -18,7 +18,7 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
      * @param type The transaction type.
      * @return A list of transaction IDs.
      */
-    @Query(value = "select transaction_id from transactions where type = :type" , nativeQuery = true)
+    @Query(value = "select transaction_id from transactions where type = :type", nativeQuery = true)
     List<Long> findAllByType(@Param(value = "type") String type);
 
     /**

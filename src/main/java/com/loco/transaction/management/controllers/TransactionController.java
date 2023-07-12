@@ -32,8 +32,8 @@ public class TransactionController {
     /**
      * Creates a new transaction.
      *
-     * @param transactionId The ID of the transaction to create.
-     * @param transactionDTO   The transaction data.
+     * @param transactionId  The ID of the transaction to create.
+     * @param transactionDTO The transaction data.
      * @return A response entity indicating the status of the operation.
      */
     @PutMapping(value = TRANSACTION_TRANSACTION_ID)

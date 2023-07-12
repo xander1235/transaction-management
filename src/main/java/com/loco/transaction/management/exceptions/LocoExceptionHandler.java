@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Set;
-
 /**
  * All types of exceptions can be handled at one Location
  */
@@ -26,8 +24,8 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles the generic exceptions
      *
-     * @param ex all the exception details
-     * @param req  It provides a way to access and manipulate various aspects of an incoming HTTP request in a web application
+     * @param ex  all the exception details
+     * @param req It provides a way to access and manipulate various aspects of an incoming HTTP request in a web application
      * @return Custom error details
      */
     @ExceptionHandler(Exception.class)
@@ -41,8 +39,8 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles all the exceptions related to LocoException
      *
-     * @param ex all the exception details
-     * @param req  It provides a way to access and manipulate various aspects of an incoming HTTP request in a web application
+     * @param ex  all the exception details
+     * @param req It provides a way to access and manipulate various aspects of an incoming HTTP request in a web application
      * @return Custom error details
      */
     @ExceptionHandler(LocoException.class)
@@ -54,9 +52,9 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles all the exceptions related to MethodArguments
      *
-     * @param ex all the exception details
+     * @param ex      all the exception details
      * @param headers HttpHeaders of the request
-     * @param status type of status related to error
+     * @param status  type of status related to error
      * @param request It provides a way to access and manipulate various aspects of an incoming HTTP request in a web application
      * @return the generic object
      */
@@ -77,7 +75,7 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles all the constraint violation exceptions like validating the method arguments might throw the exception
      *
-     * @param ex all the violated exception details
+     * @param ex      all the violated exception details
      * @param request It provides a way to access and manipulate various aspects of an incoming HTTP request in a web application
      * @return Custom error details
      */
@@ -88,7 +86,7 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
 
         StringBuilder sb = new StringBuilder();
 
-        for(ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             sb.append(violation.getMessage())
                     .append(";");
         }
@@ -101,7 +99,7 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
      * Gets the error details with given details
      *
      * @param errorMsg error message to be displayed
-     * @param status type of status related to error
+     * @param status   type of status related to error
      * @return ErrorDetails formed
      */
     private ErrorDetails getErrorDetails(String errorMsg, HttpStatus status) {

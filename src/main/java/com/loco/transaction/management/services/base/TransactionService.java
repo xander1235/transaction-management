@@ -1,8 +1,7 @@
 package com.loco.transaction.management.services.base;
 
-import com.loco.transaction.management.exceptions.ResourceNotFoundException;
 import com.loco.transaction.management.exceptions.BadRequestException;
-import com.loco.transaction.management.models.Transactions;
+import com.loco.transaction.management.exceptions.ResourceNotFoundException;
 import com.loco.transaction.management.pojo.TransactionDTO;
 import com.loco.transaction.management.pojo.response.TransactionSummation;
 
@@ -10,16 +9,17 @@ import java.util.List;
 
 public interface TransactionService {
 
-    /**'
+    /**
+     * '
      * Creates a new transaction
      *
-     * @param transactionId transaction id to create the transaction
+     * @param transactionId  transaction id to create the transaction
      * @param transactionDTO transaction details to create the transaction
-     * @return the created transaction
+     * @return the created transactionDto
      * @throws ResourceNotFoundException if parent transaction not found
-     * @throws BadRequestException if the transaction already exist with the id.
+     * @throws BadRequestException       if the transaction already exist with the id.
      */
-    Transactions createTransaction(Long transactionId, TransactionDTO transactionDTO);
+    TransactionDTO createTransaction(Long transactionId, TransactionDTO transactionDTO);
 
     /**
      * Retrieves a list of transaction IDs for transactions of a specific type.

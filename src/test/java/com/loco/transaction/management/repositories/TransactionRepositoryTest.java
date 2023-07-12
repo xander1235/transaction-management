@@ -1,6 +1,7 @@
 package com.loco.transaction.management.repositories;
 
 import com.loco.transaction.management.models.Transactions;
+import com.loco.transaction.management.utils.LocoTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,20 @@ class TransactionRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        parent = getTransaction(1L, 400.0, "cars", null);
-        child1 = getTransaction(2L, 500.0, "mobiles", 1L);
-        child2 = getTransaction(3L, 500.0, "mobiles", 1L);
+        parent = LocoTestUtils.getTransaction(1L, 400.0, "cars", null);
+        child1 = LocoTestUtils.getTransaction(2L, 500.0, "mobiles", 1L);
+        child2 = LocoTestUtils.getTransaction(3L, 500.0, "mobiles", 1L);
 
+    }
+
+    @Test
+    public void testSave() {
+
+        // Save the transaction
+        Transactions savedTransaction = repository.save(parent);
+
+        // Assert the saved transaction
+        Assertions.assertNotNull(savedTransaction.getTransactionId());
     }
 
     @Test
@@ -38,12 +49,14 @@ class TransactionRepositoryTest {
 
         repository.save(parent);
         repository.save(child1);
+        repository.save(child2);
 
         // Retrieve transactions by type
-        List<Long> transactionIds = repository.findAllByType("cars");
+        List<Long> transactionIds = repository.findAllByType("mobiles");
 
-        Assertions.assertEquals(1, transactionIds.size());
-        Assertions.assertTrue(transactionIds.contains(parent.getTransactionId()));
+        Assertions.assertEquals(2, transactionIds.size());
+        Assertions.assertTrue(transactionIds.contains(child1.getTransactionId()));
+        Assertions.assertTrue(transactionIds.contains(child2.getTransactionId()));
 
     }
 
@@ -78,22 +91,4 @@ class TransactionRepositoryTest {
         Assertions.assertTrue(transactions.stream().allMatch(t -> t.getParentId().equals(parent.getTransactionId())));
     }
 
-    @Test
-    public void testSave() {
-
-        // Save the transaction
-        Transactions savedTransaction = repository.save(parent);
-
-        // Assert the saved transaction
-        Assertions.assertNotNull(savedTransaction.getTransactionId());
-    }
-
-    Transactions getTransaction(Long transactionId, Double amount, String type, Long parentId) {
-        return Transactions.builder()
-                .transactionId(transactionId)
-                .amount(amount)
-                .type(type)
-                .parentId(parentId)
-                .build();
-    }
 }

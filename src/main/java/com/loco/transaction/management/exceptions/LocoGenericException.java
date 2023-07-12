@@ -12,7 +12,7 @@ public class LocoGenericException extends LocoException {
     }
 
     @Override
-    public  HttpStatus getHttpStatus() {
+    public HttpStatus getHttpStatus() {
         return this.status;
     }
 }
