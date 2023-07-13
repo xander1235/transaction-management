@@ -1,5 +1,7 @@
 package com.loco.transaction.management.services;
 
+import com.loco.transaction.management.constants.LocoConstants;
+import com.loco.transaction.management.constants.LocoExceptionConstants;
 import com.loco.transaction.management.exceptions.BadRequestException;
 import com.loco.transaction.management.exceptions.ResourceNotFoundException;
 import com.loco.transaction.management.models.Transactions;
@@ -15,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.loco.transaction.management.constants.LocoExceptionConstants.*;
-
 @Service
 @Slf4j
 public class TransactionServiceImpl implements TransactionService {
@@ -28,25 +28,21 @@ public class TransactionServiceImpl implements TransactionService {
         this.repository = repository;
     }
 
-    @Override
-    public List<Long> findTransactionsByType(String type) {
-        return repository.findAllByType(type);
-    }
-
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Override
     public TransactionDTO createTransaction(Long transactionId, TransactionDTO transactionDTO) {
+        log.info(LocoConstants.TRANSACTION_CREATION, transactionId);
 
         //checking if transaction already exists
         if (repository.findByTransactionId(transactionId).isPresent()) {
-            log.error(TRANSACTION_EXISTS);
-            throw new BadRequestException(TRANSACTION_EXISTS);
+            log.error(LocoExceptionConstants.TRANSACTION_EXISTS);
+            throw new BadRequestException(LocoExceptionConstants.TRANSACTION_EXISTS);
         }
 
         if (transactionDTO.getParentId() != null) {
             //checking transaction exist with specific parentId exist, if it doesn't exist throwing an exception
             repository.findByTransactionId(transactionDTO.getParentId())
-                    .orElseThrow(() -> new ResourceNotFoundException(PARENT_NOT_FOUND));
+                    .orElseThrow(() -> new ResourceNotFoundException(LocoExceptionConstants.PARENT_NOT_FOUND));
         }
 
         Transactions transactions = Transactions.builder()
@@ -64,10 +60,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public List<Long> findTransactionsByType(String type) {
+        log.info(LocoConstants.PROCESSING_TRANSACTION_TYPE, type);
+
+        return repository.findAllByType(type);
+    }
+
+    @Override
     public TransactionDTO findByTransactionId(Long transactionId) {
+        log.info(LocoConstants.PROCESSING_TRANSACTION_ID, transactionId);
+
         //If transaction not found throwing an error
         Transactions transactions = repository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(LocoExceptionConstants.TRANSACTION_NOT_FOUND));
 
         return TransactionDTO.builder()
                 .amount(transactions.getAmount())
@@ -78,9 +83,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionSummation findSumOfTransitivelyLinkedTransactions(Long transactionId) {
+        log.info(LocoConstants.TRANSACTION_AGGREGATION, transactionId);
+
         //If transaction not found throwing an error
         Transactions transactions = repository.findByTransactionId(transactionId)
-                .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(LocoExceptionConstants.TRANSACTION_NOT_FOUND));
 
         Double amount = transactions.getAmount() + aggregateSumOfChildrenTransactions(transactions.getTransactionId());
 

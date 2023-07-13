@@ -31,7 +31,7 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGenericException(Exception ex, WebRequest req) {
         ErrorDetails error = getErrorDetails(ex.getLocalizedMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        ex.printStackTrace();
+        log.error("Error occurred: {}", error);
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
@@ -46,6 +46,7 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(LocoException.class)
     public ResponseEntity<ErrorDetails> handleLocoException(LocoException ex, WebRequest req) {
         ErrorDetails error = getErrorDetails(ex.getMessage(), ex.getHttpStatus());
+        log.error("Error occurred: {}", error);
         return new ResponseEntity<>(error, ex.getHttpStatus());
     }
 
@@ -68,6 +69,8 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         ErrorDetails error = getErrorDetails(sb.toString(), HttpStatus.valueOf(status.value()));
+
+        log.error("Error occurred: {}", error);
 
         return new ResponseEntity<>(error, HttpStatus.valueOf(status.value()));
     }
@@ -92,6 +95,9 @@ public class LocoExceptionHandler extends ResponseEntityExceptionHandler {
         }
 
         ErrorDetails error = getErrorDetails(sb.toString(), HttpStatus.BAD_REQUEST);
+
+        log.error("Error occurred: {}", error);
+
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
